@@ -89,13 +89,14 @@ class Return_coverage_reports
   end
 
   def write_on_file(text, path)
+    text_array = text.split("\n")
     array_line = []
-    File.foreach(path) do |line|
+    text_array.each do |line|
       r_line = line.gsub(/&gt;/,">")
-      r_line = line.gsub(/&lt;/,"<")
-      r_line = line.gsub(/&#39;/,"'")
-      r_line = line.gsub(/&quot;/,"\"")
-      r_line = line.gsub(/&amp;/,"&")
+      r_line = r_line.gsub(/&lt;/,"<")
+      r_line = r_line.gsub(/&#39;/,"'")
+      r_line = r_line.gsub(/&quot;/,"\"")
+      r_line = r_line.gsub(/&amp;/,"&")
       array_line.push(r_line)
     end
     formated_text = ""

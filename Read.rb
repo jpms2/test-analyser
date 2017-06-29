@@ -59,14 +59,8 @@ class Read
       index += 1
       end
       worked = system("#{__dir__}/script.sh", git_url, task_num,ruby_v,rails_v,tests)
-      #if worked != nil
-      # if worked == 0
       rep_name = (/[^\/]*$/.match(git_url)).to_s[0..-5]
       Return_coverage_reports.new.save_covered_files("#{__dir__}/#{rep_name}/coverage/index.html", model.task.to_s)
-      # else
-      # end
-      #end
-      return true
     end
   end
 

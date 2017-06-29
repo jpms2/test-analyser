@@ -53,10 +53,62 @@ class Read
       rails_v =  "#{model.rails_v.to_s}"
       tests =  "#{model.tests.to_s}"
       index = 0
+      system("#{__dir__}/script_clone_checkout.sh", git_url, task_num)
+      model.test_dir.each do |test_dir|
+      update_file(test_dir, model.test_line[index])
+      index += 1
+      end
       worked = system("#{__dir__}/script.sh", git_url, task_num,ruby_v,rails_v,tests)
+      #if worked != nil
+      # if worked == 0
       rep_name = (/[^\/]*$/.match(git_url)).to_s[0..-5]
       Return_coverage_reports.new.save_covered_files("#{__dir__}/#{rep_name}/coverage/index.html", model.task.to_s)
+      # else
+      # end
+      #end
+      return true
     end
+  end
+
+  def update_file(path, line_num)
+      file_lines = read_file(path)
+      updated_file = []
+      i = 0
+      updated = false
+      while i < file_lines.length
+        if updated
+          updated_file.push file_lines[i - 1]
+        else
+          if i == line_num - 1 && !file_lines[i].include?('@cin_ufpe_tan')
+            updated_file.push '@cin_ufpe_tan' + "\n"
+            updated = true
+          else
+            updated_file.push file_lines[i]
+          end
+        end
+        i += 1
+      end
+      index = 0
+      idented_updated_file = ""
+      while index < updated_file.length
+        idented_updated_file = idented_updated_file + updated_file[index]
+        index += 1
+      end
+      write_on_file(idented_updated_file, path)
+  end
+
+  def write_on_file(text, path)
+    File.open("#{path}", 'w') do |f|
+      f.write text
+    end
+  end
+
+  def read_file(path)
+    array_line = []
+    File.foreach(path) do |line|
+      array_line.push line
+    end
+    array_line
   end
 
 end

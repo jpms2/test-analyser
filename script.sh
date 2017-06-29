@@ -1,10 +1,5 @@
 #!/bin/bash
  
-echo $1
-echo $2
-echo $3
-echo $4
-echo $5
 RubyVERSION=""
 
 if [ -z "$3" ]; then
@@ -58,4 +53,3 @@ sudo su -c '/etc/init.d/mysql restart'
 #sudo systemctl restart mysql.servisse
 RAILS_ENV=test bundle exec rake db:drop db:create db:migrate
 RAILS_ENV=test bundle exec cucumber --tags @cin_ufpe_tan
-git stash

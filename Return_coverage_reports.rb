@@ -89,8 +89,23 @@ class Return_coverage_reports
   end
 
   def write_on_file(text, path)
+    array_line = []
+    File.foreach(path) do |line|
+      r_line = line.gsub(/&gt;/,">")
+      r_line = line.gsub(/&lt;/,"<")
+      r_line = line.gsub(/&#39;/,"'")
+      r_line = line.gsub(/&quot;/,"\"")
+      r_line = line.gsub(/&amp;/,"&")
+      array_line.push(r_line)
+    end
+    formated_text = ""
+    i = 0
+    while i < array_line.length
+      formated_text = formated_text + "\n#{array_line[i]}"
+      i+= 1
+    end
     File.open("#{path}.txt", 'w') do |f|
-      f.write text
+      f.write formated_text
     end
   end
 

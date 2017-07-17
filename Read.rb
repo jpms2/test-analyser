@@ -107,4 +107,4 @@ class Read
 
 end
 
-Read.new.call_script('/home/ess/planilhas/TheOdinProject_theodinproject-tests.xls')
+Read.new.call_script('/home/ess/planilhas/tip4commit_tip4commit-tests.xls')

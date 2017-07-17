@@ -7,8 +7,9 @@ class Return_coverage_reports
     covered_files.each do |covered_file|
       indented_output = indented_output + "#{covered_file}\n"
     end
-    create_folder("#{__dir__}/#{action_hash}")
-    path = "#{__dir__}/#{action_hash}/covered_files"
+    create_folder("#{__dir__}/all")
+    create_folder("#{__dir__}/all/#{action_hash}")
+    path = "#{__dir__}/all/#{action_hash}/covered_files"
       write_on_file(indented_output,path)
     get_covered_lines(file_path, covered_files, action_hash)
   end
@@ -52,8 +53,8 @@ class Return_coverage_reports
       end
       if file_number < covered_files.length
         file_name = (covered_files[file_number].match(/(\/)(?!.*\/).+/).to_s)[1..-4]
-        path = "#{__dir__}/#{action_hash}/files/#{file_name}"
-        create_folder("#{__dir__}/#{action_hash}/files")
+        path = "#{__dir__}/all/#{action_hash}/files/#{file_name}"
+        create_folder("#{__dir__}/all/#{action_hash}/files")
         write_on_file(indented_output,path)
       end
       file_number += 1

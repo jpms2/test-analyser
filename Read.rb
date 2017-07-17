@@ -26,17 +26,17 @@ class Read
           line_num = /(?<=\().+?(?=\))/.match test
           line_content = /.*\(/.match test
           line = line_content.to_s[0...-1]
-	  if model.tests.to_s != ''
-	    model.tests = "#{model.tests}," + "#{line}:#{line_num}"
-	    model.test_dir.push "#{__dir__}/#{project_name}/#{line}"
-	    model.test_line.push Integer(line_num.to_s)
-	  else
-	    model.tests = "#{line}:#{line_num}"
-	    model.test_dir.push "#{__dir__}/#{project_name}/#{line}"
-	    model.test_line.push Integer(line_num.to_s)
-	  end
+          if model.tests.to_s != ''
+            model.tests = "#{model.tests}," + "#{line}:#{line_num}"
+            model.test_dir.push "#{__dir__}/#{project_name}/#{line}"
+            model.test_line.push Integer(line_num.to_s)
+          else
+            model.tests = "#{line}:#{line_num}"
+            model.test_dir.push "#{__dir__}/#{project_name}/#{line}"
+            model.test_line.push Integer(line_num.to_s)
+          end
         end
-	index += 1
+	      index += 1
       end
       model_array.push(model)
     end
@@ -53,12 +53,12 @@ class Read
       rails_v =  "#{model.rails_v.to_s}"
       tests =  "#{model.tests.to_s}"
       index = 0
-      system("#{__dir__}/script_clone_checkout.sh", git_url, task_num)
+      #system("#{__dir__}/script_clone_checkout.sh", git_url, task_num)
       model.test_dir.each do |test_dir|
-      update_file(test_dir, model.test_line[index])
-      index += 1
+        update_file(test_dir, model.test_line[index])
+        index += 1
       end
-      worked = system("#{__dir__}/script.sh", git_url, task_num,ruby_v,rails_v,tests)
+      #worked = system("#{__dir__}/script.sh", git_url, task_num,ruby_v,rails_v,tests)
       rep_name = (/[^\/]*$/.match(git_url)).to_s[0..-5]
       Return_coverage_reports.new.save_covered_files("#{__dir__}/#{rep_name}/coverage/index.html", model.task.to_s)
     end

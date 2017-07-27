@@ -48,6 +48,8 @@ bundle install
  
 sudo su -c '/etc/init.d/postgresql restart'
 sudo su -c '/etc/init.d/mysql restart'
+sudo service redis_6379 stop
+sudo service redis_6379 start
 #sudo servisse mysql restart
 #sudo netstat -tap | grep mysql
 #sudo systemctl restart mysql.servisse

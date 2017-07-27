@@ -47,18 +47,24 @@ class Read
     modelsAndUrl = read_from_ss(ss_path)
     model_array = modelsAndUrl[0]
     model_array.each do |model|
+      puts model.test_dir.length
       git_url = "#{modelsAndUrl[1].to_s}"
       ruby_v = "#{model.ruby_v.to_s}"
       task_num = "#{model.task_num.to_s}"
       rails_v =  "#{model.rails_v.to_s}"
       tests =  "#{model.tests.to_s}"
       index = 0
-      #system("#{__dir__}/script_clone_checkout.sh", git_url, task_num)
+      system("#{__dir__}/script_clone_checkout.sh", git_url, task_num)
       model.test_dir.each do |test_dir|
+	check = index - 1
+	while test_dir == model.test_dir[check] && check != -1
+	  model.test_line[index] += 1
+	  check -= 1
+	end
         update_file(test_dir, model.test_line[index])
         index += 1
       end
-      #worked = system("#{__dir__}/script.sh", git_url, task_num,ruby_v,rails_v,tests)
+      worked = system("#{__dir__}/script.sh", git_url, task_num,ruby_v,rails_v,tests)
       rep_name = (/[^\/]*$/.match(git_url)).to_s[0..-5]
       Return_coverage_reports.new.save_covered_files("#{__dir__}/#{rep_name}/coverage/index.html", model.task.to_s)
     end
@@ -82,6 +88,7 @@ class Read
         end
         i += 1
       end
+      updated_file.push file_lines[file_lines.length - 1]
       index = 0
       idented_updated_file = ""
       while index < updated_file.length
@@ -107,4 +114,4 @@ class Read
 
 end
 
-Read.new.call_script('/home/ess/planilhas/tip4commit_tip4commit-tests.xls')
+Read.new.call_script('/home/ess/planilhas/otwcode_otwarchive-tests.xls')

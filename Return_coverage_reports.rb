@@ -1,15 +1,16 @@
 
 class Return_coverage_reports
 
-  def save_covered_files(file_path, action_hash)
+  def save_covered_files(file_path, action_hash, repository_name)
     covered_files = get_covered_classes(file_path)
     indented_output = ''
     covered_files.each do |covered_file|
       indented_output = indented_output + "#{covered_file}\n"
     end
     create_folder("#{__dir__}/all")
-    create_folder("#{__dir__}/all/#{action_hash}")
-    path = "#{__dir__}/all/#{action_hash}/covered_files"
+    create_folder("#{__dir__}/all/#{repository_name}/")
+    create_folder("#{__dir__}/all/#{repository_name}/#{action_hash}")
+    path = "#{__dir__}/all/#{repository_name}/#{action_hash}/covered_files"
       write_on_file(indented_output,path)
     get_covered_lines(file_path, covered_files, action_hash)
   end

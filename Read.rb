@@ -56,21 +56,22 @@ class Read
       index = 0
       system("#{__dir__}/script_clone_checkout.sh", git_url, task_num)
       model.test_dir.each do |test_dir|
-	check = index - 1
-	while test_dir == model.test_dir[check] && check != -1
-	  model.test_line[index] += 1
-	  check -= 1
-	end
-        update_file(test_dir, model.test_line[index])
+        check = index - 1
+        while test_dir == model.test_dir[check] && check != -1
+          model.test_line[index] += 1
+          check -= 1
+        end
+        update_file_by_line(test_dir, model.test_line[index])
         index += 1
       end
+      update_cov_config_file("#{__dir__}/#{rep_name}/features/support/env.rb")
       worked = system("#{__dir__}/script.sh", git_url, task_num,ruby_v,rails_v,tests)
       rep_name = (/[^\/]*$/.match(git_url)).to_s[0..-5]
-      Return_coverage_reports.new.save_covered_files("#{__dir__}/#{rep_name}/coverage/index.html", model.task.to_s)
+      Return_coverage_reports.new.save_covered_files("#{__dir__}/#{rep_name}/coverage/index.html", model.task.to_s,rep_name)
     end
   end
 
-  def update_file(path, line_num)
+  def update_file_by_line(path, line_num)
       file_lines = read_file(path)
       updated_file = []
       i = 0
@@ -98,6 +99,29 @@ class Read
       write_on_file(idented_updated_file, path)
   end
 
+  def update_cov_config_file(path)
+    file_lines = read_file(path)
+    updated_file = []
+    index = 0
+    while index < file_lines.length
+      if (file_lines[index].include?("require 'cucumber/rails'")) && (!file_lines[index + 1].include?("require 'simplecov'"))
+        updated_file.push(file_lines[index])
+        updated_file.push("require 'simplecov'\n")
+        updated_file.push('SimpleCov.start')
+      else
+        updated_file.push(file_lines[index])
+      end
+      index += 1
+    end
+    i = 0
+    idented_updated_file = ""
+    while i < updated_file.length
+      idented_updated_file = idented_updated_file + updated_file[i]
+      i += 1
+    end
+    write_on_file(idented_updated_file, path)
+  end
+
   def write_on_file(text, path)
     File.open("#{path}", 'w') do |f|
       f.write text
@@ -114,4 +138,5 @@ class Read
 
 end
 
-Read.new.call_script('/home/ess/planilhas/otwcode_otwarchive-tests.xls')
+#Read.new.call_script('/home/ess/planilhas/otwcode_otwarchive-tests.xls')
+Read.new.update_cov_config_file('C:/Users/jpms2/Desktop/testFile')

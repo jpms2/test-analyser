@@ -72,10 +72,14 @@ class Read
         index += 1
       end
       rep_name = (/[^\/]*$/.match(git_url)).to_s[0..-5]
+      config_dir = "#{__dir__}/#{rep_name}/config/config.yml.example"
+      database_dir = "#{__dir__}/#{rep_name}/config/database.yml.example"
+      update_config_files(config_dir,database_dir)
       update_cov_config_file("#{__dir__}/#{rep_name}/features/support/env.rb")
       worked = system("#{__dir__}/script.sh", git_url, task_num,ruby_v,rails_v,tests)
       sheet_type = modelsAndUrl[2]
-      Return_coverage_reports.new.save_covered_files("#{__dir__}/#{rep_name}/coverage/index.html", model.task.to_s,rep_name, sheet_type)
+      index_dir = "#{__dir__}/#{rep_name}/coverage/index.html"
+      Return_coverage_reports.new.save_covered_files(index_dir, model.task.to_s,rep_name, sheet_type)
     end
   end
 
@@ -105,6 +109,15 @@ class Read
         index += 1
       end
       write_on_file(idented_updated_file, path)
+  end
+
+  def update_config_files(config_path, database_path)
+    if File.file? config_path
+      File.rename(config_path, config_path[0..-9])
+    end
+    if File.file? database_path
+      File.rename(database_path, database_path[0..-9])
+    end
   end
 
   def update_cov_config_file(path)

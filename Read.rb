@@ -7,6 +7,13 @@ class Read
     model_array  = []
     Spreadsheet.client_encoding = 'UTF-8'
     book = Spreadsheet.open ss_path
+    sheet_type = ""
+    if ((/-.*/.match ss_path).to_s).include?"all"
+      sheet_type = "all"
+    end
+    if ((/-.*/.match ss_path).to_s).include?"added"
+      sheet_type = "added"
+    end
     sheet = book.worksheet 0
     github_url = sheet.row(0)[1]
     project_name = (/([^\/]+)$/.match github_url).to_s[0...-4]
@@ -40,7 +47,7 @@ class Read
       end
       model_array.push(model)
     end
-    [model_array, github_url]
+    [model_array, github_url,sheet_type]
   end
 
   def call_script(ss_path)
@@ -64,10 +71,11 @@ class Read
         update_file_by_line(test_dir, model.test_line[index])
         index += 1
       end
+      rep_name = (/[^\/]*$/.match(git_url)).to_s[0..-5]
       update_cov_config_file("#{__dir__}/#{rep_name}/features/support/env.rb")
       worked = system("#{__dir__}/script.sh", git_url, task_num,ruby_v,rails_v,tests)
-      rep_name = (/[^\/]*$/.match(git_url)).to_s[0..-5]
-      Return_coverage_reports.new.save_covered_files("#{__dir__}/#{rep_name}/coverage/index.html", model.task.to_s,rep_name)
+      sheet_type = modelsAndUrl[2]
+      Return_coverage_reports.new.save_covered_files("#{__dir__}/#{rep_name}/coverage/index.html", model.task.to_s,rep_name, sheet_type)
     end
   end
 
@@ -107,7 +115,7 @@ class Read
       if (file_lines[index].include?("require 'cucumber/rails'")) && (!file_lines[index + 1].include?("require 'simplecov'"))
         updated_file.push(file_lines[index])
         updated_file.push("require 'simplecov'\n")
-        updated_file.push('SimpleCov.start')
+        updated_file.push("SimpleCov.start\n")
       else
         updated_file.push(file_lines[index])
       end
@@ -138,5 +146,5 @@ class Read
 
 end
 
-#Read.new.call_script('/home/ess/planilhas/otwcode_otwarchive-tests.xls')
-Read.new.update_cov_config_file('C:/Users/jpms2/Desktop/testFile')
+Read.new.call_script('/home/ess/planilhas/tip4commit-tests-all.xls')
+#Read.new.update_cov_config_file('C:/Users/jpms2/Desktop/testFile')

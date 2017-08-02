@@ -1,18 +1,29 @@
 
 class Return_coverage_reports
 
-  def save_covered_files(file_path, action_hash, repository_name)
+  def save_covered_files(file_path, action_hash, repository_name, sheet_type)
     covered_files = get_covered_classes(file_path)
     indented_output = ''
     covered_files.each do |covered_file|
       indented_output = indented_output + "#{covered_file}\n"
     end
-    create_folder("#{__dir__}/all")
-    create_folder("#{__dir__}/all/#{repository_name}/")
-    create_folder("#{__dir__}/all/#{repository_name}/#{action_hash}")
-    path = "#{__dir__}/all/#{repository_name}/#{action_hash}/covered_files"
-      write_on_file(indented_output,path)
-    get_covered_lines(file_path, covered_files, action_hash)
+
+    folder = ""
+    if sheet_type == "all"
+      create_folder("#{__dir__}/all")
+      create_folder("#{__dir__}/all/result_#{repository_name}/")
+      create_folder("#{__dir__}/all/result_#{repository_name}/#{action_hash}")
+      path = "#{__dir__}/all/result_#{repository_name}/#{action_hash}/covered_files"
+      folder = "all"
+    else
+      create_folder("#{__dir__}/added")
+      create_folder("#{__dir__}/added/result_#{repository_name}/")
+      create_folder("#{__dir__}/added/result_#{repository_name}/#{action_hash}")
+      path = "#{__dir__}/added/result_#{repository_name}/#{action_hash}/covered_files"
+      folder = "added"
+    end
+    write_on_file(indented_output,path)
+    get_covered_lines(file_path, covered_files, action_hash, repository_name, folder)
   end
 
   def get_covered_classes(file_path)
@@ -37,7 +48,7 @@ class Return_coverage_reports
   output_array.uniq
   end
 
-  def get_covered_lines(file_path, covered_files, action_hash)
+  def get_covered_lines(file_path, covered_files, action_hash, repository_name, folder)
     line_hit_regex = /class="hits.+\n.+\n.+/
     ruby_with_html_regex = /ruby">.*</
     file_number = 0
@@ -54,8 +65,8 @@ class Return_coverage_reports
       end
       if file_number < covered_files.length
         file_name = (covered_files[file_number].match(/(\/)(?!.*\/).+/).to_s)[1..-4]
-        path = "#{__dir__}/all/#{action_hash}/files/#{file_name}"
-        create_folder("#{__dir__}/all/#{action_hash}/files")
+        path = "#{__dir__}/#{folder}/result_#{repository_name}/#{action_hash}/files/#{file_name}"
+        create_folder("#{__dir__}/#{folder}/result_#{repository_name}/#{action_hash}/files")
         write_on_file(indented_output,path)
       end
       file_number += 1

@@ -18,7 +18,7 @@ if [[ "$NUMERAL" = "2" ]]; then
 fi
 if [[ "$NUMERAL" = "2" ]]; then
     if [[ "$DECIMAL" = "3" ]]; then
-        RubyVERSION="1.9.1"
+        RubyVERSION="1.9.3"
     fi
 fi
 if ((NUMERAL >= 3)); then
@@ -35,23 +35,16 @@ fi
 source ~/.rvm/scripts/rvm
 type rvm | head -n 1
 rvm use $RubyVERSION
-gem install rails -v $4
-gem install bundler -v '= 1.5.1'
- 
-git clone $1
-a=$1; a="${a#*/}";a="${a#*/}";a="${a#*/}";a="${a#*/}"
-cd "${a%.*}"
-git checkout $2
-
-#bundle update
-bundle install
  
 sudo su -c '/etc/init.d/postgresql restart'
 sudo su -c '/etc/init.d/mysql restart'
-sudo service redis_6379 stop
-sudo service redis_6379 start
+#sudo service redis_6379 stop
+#sudo service redis_6379 start
 #sudo servisse mysql restart
 #sudo netstat -tap | grep mysql
 #sudo systemctl restart mysql.servisse
+a=$1; a="${a#*/}";a="${a#*/}";a="${a#*/}";a="${a#*/}"
+cd "${a%.*}"
+bundle install
 RAILS_ENV=test bundle exec rake db:drop db:create db:migrate
 RAILS_ENV=test bundle exec cucumber --tags @cin_ufpe_tan

@@ -72,9 +72,10 @@ class Read
         index += 1
       end
       rep_name = (/[^\/]*$/.match(git_url)).to_s[0..-5]
-      config_dir = "#{__dir__}/#{rep_name}/config/config.yml.example"
-      database_dir = "#{__dir__}/#{rep_name}/config/database.yml.example"
-      update_config_files(config_dir,database_dir)
+      if rep_name == "diaspora"
+        update_gemfile("#{__dir__}/#{rep_name}/Gemfile")
+      end
+      update_config_files(rep_name)
       update_cov_config_file("#{__dir__}/#{rep_name}/features/support/env.rb")
       worked = system("#{__dir__}/script.sh", git_url, task_num,ruby_v,rails_v,tests)
       sheet_type = modelsAndUrl[2]
@@ -111,21 +112,76 @@ class Read
       write_on_file(idented_updated_file, path)
   end
 
-  def update_config_files(config_path, database_path)
+  def update_config_files(rep_name)
+    config_path = "#{__dir__}/#{rep_name}/config/config.yml.sample"
+    database_path = "#{__dir__}/#{rep_name}/config/database.yml.sample"
+    database_path2 = "#{__dir__}/#{rep_name}/config/database.yml.tmpl"
+    database_path3 = "#{__dir__}/#{rep_name}/config/database.yml.example"
+    site_path = "#{__dir__}/#{rep_name}/config/site.yml.tmpl"
+    diaspora_path = "#{__dir__}/#{rep_name}/config/diaspora.yml.example"
+      
     if File.file? config_path
-      File.rename(config_path, config_path[0..-9])
+      File.rename(config_path, config_path[0..-8])
     end
     if File.file? database_path
-      File.rename(database_path, database_path[0..-9])
+      File.rename(database_path, database_path[0..-8])
+    end
+    if File.file? database_path2
+      File.rename(database_path2, database_path2[0..-6])
+    end
+    if File.file? database_path3
+      File.rename(database_path3, database_path3[0..-9])
+    end
+    if File.file? site_path
+      File.rename(site_path, site_path[0..-6])
+    end
+    if File.file? diaspora_path
+      File.rename(diaspora_path, diaspora_path[0..-9])
     end
   end
+
+    def update_gemfile(path)
+    file_lines = read_file(path)
+    updated_file = []
+    index = 0
+    while index < file_lines.length
+     if (file_lines[index].include?("  gem \"pg\",     \"0.18.4\"")) && (file_lines[2].include?("gem \"rails\", \"4.2.5.1\""))
+        updated_file.pop
+        updated_file.push("gem \"pg\"\n")
+        updated_file.push("gem 'rake', '< 11'\n")
+        index += 2
+      end
+
+      if file_lines[index].include?("gem \"rails\", \"4.2.5\"")
+        updated_file.push(file_lines[index])
+        updated_file.push("gem \"pg\"\n")
+        updated_file.push("gem 'rake', '< 11'\n")
+      else
+        if file_lines[index].include?("  gem \"pg\",     \"0.18.4\"")
+          updated_file.pop
+          index += 2
+        else
+          updated_file.push(file_lines[index])
+        end
+      end
+      index += 1
+    end
+    i = 0
+    idented_updated_file = ""
+    while i < updated_file.length
+      idented_updated_file = idented_updated_file + updated_file[i]
+      i += 1
+    end
+    write_on_file(idented_updated_file, path)
+  end
+
 
   def update_cov_config_file(path)
     file_lines = read_file(path)
     updated_file = []
     index = 0
     while index < file_lines.length
-      if (file_lines[index].include?("require 'cucumber/rails'")) && (!file_lines[index + 1].include?("require 'simplecov'"))
+      if ((file_lines[index].include?("require 'cucumber/rails'")) || file_lines[index].include?("require \"cucumber/rails\"")) && (!file_lines[index + 1].include?("require 'simplecov'"))
         updated_file.push(file_lines[index])
         updated_file.push("require 'simplecov'\n")
         updated_file.push("SimpleCov.start\n")
@@ -159,5 +215,5 @@ class Read
 
 end
 
-Read.new.call_script('/home/ess/planilhas/tip4commit-tests-all.xls')
+Read.new.call_script('/home/ess/planilhas/diaspora-tests-added.xls')
 #Read.new.update_cov_config_file('C:/Users/jpms2/Desktop/testFile')

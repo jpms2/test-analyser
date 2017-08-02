@@ -48,3 +48,4 @@ cd "${a%.*}"
 bundle install
 RAILS_ENV=test bundle exec rake db:drop db:create db:migrate
 RAILS_ENV=test bundle exec cucumber --tags @cin_ufpe_tan
+

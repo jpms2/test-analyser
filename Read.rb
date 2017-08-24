@@ -24,7 +24,11 @@ class Read
       model.ruby_v = row[2]
       model.rails_v = row[3]
       model.coveralls = row[4]
-      all_tests = row[5].scan /[^;]*/
+      if row[5].include?('coveralls') || row[5].include?('simplecov')
+        all_tests = row[6].scan /[^;]*/
+      else
+        all_tests = row[5].scan /[^;]*/
+      end
       index = 0
       model.test_dir = []
       model.test_line = []
@@ -117,8 +121,11 @@ class Read
     database_path = "#{__dir__}/#{rep_name}/config/database.yml.sample"
     database_path2 = "#{__dir__}/#{rep_name}/config/database.yml.tmpl"
     database_path3 = "#{__dir__}/#{rep_name}/config/database.yml.example"
+    database_path4 = "#{__dir__}/#{rep_name}/config/database.travis.yml"
     site_path = "#{__dir__}/#{rep_name}/config/site.yml.tmpl"
     diaspora_path = "#{__dir__}/#{rep_name}/config/diaspora.yml.example"
+    redis_path = "#{__dir__}/#{rep_name}/config/redis-cucumber.conf.example"
+    redis_conf_path = "#{__dir__}/#{rep_name}/config/redis.travis.example"
       
     if File.file? config_path
       File.rename(config_path, config_path[0..-8])
@@ -132,11 +139,20 @@ class Read
     if File.file? database_path3
       File.rename(database_path3, database_path3[0..-9])
     end
+    if File.file? database_path4
+      File.rename(database_path4, "#{database_path3[0..-11]}ml")
+    end
     if File.file? site_path
       File.rename(site_path, site_path[0..-6])
     end
     if File.file? diaspora_path
       File.rename(diaspora_path, diaspora_path[0..-9])
+    end
+    if File.file? redis_path
+      File.rename(redis_path, redis_path[0..-9])
+    end
+    if File.file? redis_conf_path
+      File.rename(redis_conf_path, "#{redis_conf_path[0..-16]}.conf")
     end
   end
 
@@ -215,5 +231,5 @@ class Read
 
 end
 
-Read.new.call_script('/home/ess/planilhas/diaspora-tests-added.xls')
+Read.new.call_script('/home/ess/planilhas/rapidftr-tests-added.xls')
 #Read.new.update_cov_config_file('C:/Users/jpms2/Desktop/testFile')

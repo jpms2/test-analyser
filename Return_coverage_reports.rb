@@ -10,16 +10,16 @@ class Return_coverage_reports
 
     folder = ""
     if sheet_type == "all"
-      create_folder("#{__dir__}/all")
-      create_folder("#{__dir__}/all/result_#{repository_name}/")
-      create_folder("#{__dir__}/all/result_#{repository_name}/#{action_hash}")
-      path = "#{__dir__}/all/result_#{repository_name}/#{action_hash}/covered_files"
+      create_folder("#{__dir__}/results/all")
+      create_folder("#{__dir__}/results/all/result_#{repository_name}/")
+      create_folder("#{__dir__}/results/all/result_#{repository_name}/#{action_hash}")
+      path = "#{__dir__}/results/all/result_#{repository_name}/#{action_hash}/covered_files"
       folder = "all"
     else
-      create_folder("#{__dir__}/added")
-      create_folder("#{__dir__}/added/result_#{repository_name}/")
-      create_folder("#{__dir__}/added/result_#{repository_name}/#{action_hash}")
-      path = "#{__dir__}/added/result_#{repository_name}/#{action_hash}/covered_files"
+      create_folder("#{__dir__}/results/added")
+      create_folder("#{__dir__}/results/added/result_#{repository_name}/")
+      create_folder("#{__dir__}/results/added/result_#{repository_name}/#{action_hash}")
+      path = "#{__dir__}/results/added/result_#{repository_name}/#{action_hash}/covered_files"
       folder = "added"
     end
     write_on_file(indented_output,path)
@@ -65,8 +65,8 @@ class Return_coverage_reports
       end
       if file_number < covered_files.length
         file_name = (covered_files[file_number].match(/(\/)(?!.*\/).+/).to_s)[1..-4]
-        path = "#{__dir__}/#{folder}/result_#{repository_name}/#{action_hash}/files/#{file_name}"
-        create_folder("#{__dir__}/#{folder}/result_#{repository_name}/#{action_hash}/files")
+        path = "#{__dir__}/results/#{folder}/result_#{repository_name}/#{action_hash}/files/#{file_name}"
+        create_folder("#{__dir__}/results/#{folder}/result_#{repository_name}/#{action_hash}/files")
         write_on_file(indented_output,path)
       end
       file_number += 1

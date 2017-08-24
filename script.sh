@@ -34,18 +34,29 @@ else
 fi
 source ~/.rvm/scripts/rvm
 type rvm | head -n 1
+a=$1; a="${a#*/}";a="${a#*/}";a="${a#*/}";a="${a#*/}"
+if [[ ${a%.*} = "RapidFTR" ]]; then
+rvm use "2.1.2"
+else
 rvm use $RubyVERSION
- 
+fi
 sudo su -c '/etc/init.d/postgresql restart'
-sudo su -c '/etc/init.d/mysql restart'
-#sudo service redis_6379 stop
-#sudo service redis_6379 start
+#sudo su -c '/etc/init.d/mysql restart'
+sudo service redis_6379 stop
+sudo service redis_6379 start
 #sudo servisse mysql restart
 #sudo netstat -tap | grep mysql
 #sudo systemctl restart mysql.servisse
-a=$1; a="${a#*/}";a="${a#*/}";a="${a#*/}";a="${a#*/}"
 cd "${a%.*}"
+if [[ ${a%.*} = "otwarchive" ]]; then
+  gem install bundler
+fi
 bundle install
-RAILS_ENV=test bundle exec rake db:drop db:create db:migrate
+if [[ ${a%.*} = "RapidFTR" ]]; then
+  rake sunspot:solr:start
+  RAILS_ENV=test bundle exec rake app:reset db:seed
+else
+  RAILS_ENV=test bundle exec rake db:drop db:create db:migrate
+fi
 RAILS_ENV=test bundle exec cucumber --tags @cin_ufpe_tan
 

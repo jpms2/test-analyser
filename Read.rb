@@ -80,7 +80,9 @@ class Read
         update_gemfile("#{__dir__}/#{rep_name}/Gemfile")
       end
       update_config_files(rep_name)
-      update_cov_config_file("#{__dir__}/#{rep_name}/features/support/env.rb")
+      if model.coveralls.include? 'simplecov'
+        update_cov_config_file("#{__dir__}/#{rep_name}/features/support/env.rb")
+      end
       worked = system("#{__dir__}/script.sh", git_url, task_num,ruby_v,rails_v,tests)
       sheet_type = modelsAndUrl[2]
       index_dir = "#{__dir__}/#{rep_name}/coverage/index.html"
@@ -118,6 +120,7 @@ class Read
 
   def update_config_files(rep_name)
     config_path = "#{__dir__}/#{rep_name}/config/config.yml.sample"
+    app_path = "#{__dir__}/#{rep_name}/config/application.yml.sample"
     database_path = "#{__dir__}/#{rep_name}/config/database.yml.sample"
     database_path2 = "#{__dir__}/#{rep_name}/config/database.yml.tmpl"
     database_path3 = "#{__dir__}/#{rep_name}/config/database.yml.example"
@@ -129,6 +132,9 @@ class Read
       
     if File.file? config_path
       File.rename(config_path, config_path[0..-8])
+    end
+    if File.file? app_path
+      File.rename(app_path, app_path[0..-8])
     end
     if File.file? database_path
       File.rename(database_path, database_path[0..-8])
@@ -191,7 +197,6 @@ class Read
     write_on_file(idented_updated_file, path)
   end
 
-
   def update_cov_config_file(path)
     file_lines = read_file(path)
     updated_file = []
@@ -231,5 +236,5 @@ class Read
 
 end
 
-Read.new.call_script('/home/ess/planilhas/rapidftr-tests-added.xls')
+Read.new.call_script('/home/ess/planilhas/oneclickorgs-tests-added.xls')
 #Read.new.update_cov_config_file('C:/Users/jpms2/Desktop/testFile')

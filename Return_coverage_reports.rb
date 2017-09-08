@@ -10,12 +10,14 @@ class Return_coverage_reports
 
     folder = ""
     if sheet_type == "all"
+      create_folder("#{__dir__}/results")
       create_folder("#{__dir__}/results/all")
       create_folder("#{__dir__}/results/all/result_#{repository_name}/")
       create_folder("#{__dir__}/results/all/result_#{repository_name}/#{action_hash}")
       path = "#{__dir__}/results/all/result_#{repository_name}/#{action_hash}/covered_files"
       folder = "all"
     else
+      create_folder("#{__dir__}/results")
       create_folder("#{__dir__}/results/added")
       create_folder("#{__dir__}/results/added/result_#{repository_name}/")
       create_folder("#{__dir__}/results/added/result_#{repository_name}/#{action_hash}")

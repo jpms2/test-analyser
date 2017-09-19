@@ -76,11 +76,11 @@ class Read
         index += 1
       end
       rep_name = (/[^\/]*$/.match(git_url)).to_s[0..-5]
-      if rep_name == "diaspora"
+      if rep_name == "diaspora" || rep_name == "wpcc"
         update_gemfile("#{__dir__}/#{rep_name}/Gemfile")
       end
       update_config_files(rep_name)
-      if model.coveralls.include? 'simplecov'
+      if model.coveralls.nil? || (model.coveralls.include? 'simplecov')
         update_cov_config_file("#{__dir__}/#{rep_name}/features/support/env.rb")
       end
       worked = system("#{__dir__}/script.sh", git_url, task_num,ruby_v,rails_v,tests)
@@ -125,6 +125,7 @@ class Read
     database_path2 = "#{__dir__}/#{rep_name}/config/database.yml.tmpl"
     database_path3 = "#{__dir__}/#{rep_name}/config/database.yml.example"
     database_path4 = "#{__dir__}/#{rep_name}/config/database.travis.yml"
+    database_path5 = "#{__dir__}/#{rep_name}/config/_database.yml"
     site_path = "#{__dir__}/#{rep_name}/config/site.yml.tmpl"
     diaspora_path = "#{__dir__}/#{rep_name}/config/diaspora.yml.example"
     redis_path = "#{__dir__}/#{rep_name}/config/redis-cucumber.conf.example"
@@ -147,6 +148,9 @@ class Read
     end
     if File.file? database_path4
       File.rename(database_path4, "#{database_path3[0..-11]}ml")
+    end
+    if File.file? database_path5
+      File.rename(database_path5, "#{__dir__}/#{rep_name}/config/database.yml")
     end
     if File.file? site_path
       File.rename(site_path, site_path[0..-6])
@@ -183,7 +187,11 @@ class Read
           updated_file.pop
           index += 2
         else
+         if file_lines[index].include? "http://gems.dev.mas.local"
+           updated_file.push("gem 'dough-ruby', path: '/home/ess/test-analyser/dough'\n")
+         else
           updated_file.push(file_lines[index])
+         end
         end
       end
       index += 1
@@ -236,5 +244,5 @@ class Read
 
 end
 
-Read.new.call_script('/home/ess/planilhas/oneclickorgs-tests-added.xls')
+Read.new.call_script('/home/ess/planilhas/openproject-tests-all.xls')
 #Read.new.update_cov_config_file('C:/Users/jpms2/Desktop/testFile')

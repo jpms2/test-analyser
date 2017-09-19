@@ -18,7 +18,7 @@ if [[ "$NUMERAL" = "2" ]]; then
 fi
 if [[ "$NUMERAL" = "2" ]]; then
     if [[ "$DECIMAL" = "3" ]]; then
-        RubyVERSION="1.9.3"
+        RubyVERSION="2.1.0"
     fi
 fi
 if ((NUMERAL >= 3)); then
@@ -70,13 +70,22 @@ else
   if [[ ${a%.*} = "one-click-orgs" ]]; then 
     bundle exec rake oco:generate_config
   fi
+  if [[ ${a%.*} = "wpcc" ]]; then
+    gem install bundler
+    cd ..
+    cd dough
+    bower link
+    cd ..
+    cd ${a%.*}
+    bower link dough
+  fi
 
   bundle install
-  if [[ ${a%.*} = "whitehall" ]]; then
+  if [[ ${a%.*} = "whitehall" || ${a%.*} = "solar" ]]; then
     RAILS_ENV=test bundle exec rake db:setup
   else
     if [[ ${a%.*} != "otwarchive" ]]; then
-      if [[ ${a%.*} != "RapidFTR" ]]; then
+      if [[ ${a%.*} != "RapidFTR" || ${a%.*} != "wpcc" ]]; then
         RAILS_ENV=test bundle exec rake db:drop db:create db:migrate
       fi
     fi

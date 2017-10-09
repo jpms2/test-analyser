@@ -137,3 +137,5 @@ class Return_coverage_reports
   array_line
   end
 end
+
+#Return_coverage_reports.new.save_covered_files("//home//ess//test-analyser//solar//coverage//index.html", "68b36f7d04ba52402a51bf0dca94c06310d62287", "solar", "all")

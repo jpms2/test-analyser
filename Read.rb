@@ -80,9 +80,7 @@ class Read
         update_gemfile("#{__dir__}/#{rep_name}/Gemfile")
       end
       update_config_files(rep_name)
-      if model.coveralls.nil? || (model.coveralls.include? 'simplecov')
-        update_cov_config_file("#{__dir__}/#{rep_name}/features/support/env.rb")
-      end
+      update_cov_config_file("#{__dir__}/#{rep_name}/features/support/env.rb")
       worked = system("#{__dir__}/script.sh", git_url, task_num,ruby_v,rails_v,tests)
       sheet_type = modelsAndUrl[2]
       index_dir = "#{__dir__}/#{rep_name}/coverage/index.html"
@@ -209,13 +207,22 @@ class Read
     file_lines = read_file(path)
     updated_file = []
     index = 0
+    updated = false
     while index < file_lines.length
-      if ((file_lines[index].include?("require 'cucumber/rails'")) || file_lines[index].include?("require \"cucumber/rails\"")) && (!file_lines[index + 1].include?("require 'simplecov'"))
-        updated_file.push(file_lines[index])
-        updated_file.push("require 'simplecov'\n")
+      if (file_lines[index].include?("require 'coveralls'") && !updated)
+	updated_file.push("require 'simplecov'\n")
         updated_file.push("SimpleCov.start\n")
+	updated = true
       else
-        updated_file.push(file_lines[index])
+        if !file_lines[index].include?("Coveralls.wear_merged!")
+          if ((file_lines[index].include?("require 'cucumber/rails'")) || file_lines[index].include?("require \"cucumber/rails\"")) && (!file_lines[index + 1].include?("require 'simplecov'") && !updated)
+            updated_file.push(file_lines[index])
+            updated_file.push("require 'simplecov'\n")
+            updated_file.push("SimpleCov.start\n")
+          else
+            updated_file.push(file_lines[index])
+          end
+        end
       end
       index += 1
     end
@@ -244,5 +251,5 @@ class Read
 
 end
 
-Read.new.call_script('/home/ess/planilhas/openproject-tests-all.xls')
+Read.new.call_script('/home/ess/planilhas/websiteone-tests-all.xls')
 #Read.new.update_cov_config_file('C:/Users/jpms2/Desktop/testFile')

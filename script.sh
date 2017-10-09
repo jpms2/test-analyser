@@ -52,7 +52,7 @@ cd "${a%.*}"
 
 if [[ ${a%.*} = "WebsiteOne" ]]; then
   wget https://github.com/AgileVentures/setup-scripts/raw/develop/scripts/rails_setup.sh
-HEADLESS=true WITH_PHANTOMJS=true REQUIRED_RUBY=2.1.1 source rails_setup.sh
+HEADLESS=true WITH_PHANTOMJS=true REQUIRED_RUBY=2.3.1 source rails_setup.sh
 
 else
   if [[ ${a%.*} = "otwarchive" || ${a%.*} = "WebsiteOne" ]]; then

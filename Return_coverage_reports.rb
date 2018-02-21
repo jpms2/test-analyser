@@ -1,3 +1,4 @@
+require_relative 'Correct_coverage_report'
 
 class Return_coverage_reports
 
@@ -15,6 +16,7 @@ class Return_coverage_reports
       create_folder("#{__dir__}/results/all/result_#{repository_name}/")
       create_folder("#{__dir__}/results/all/result_#{repository_name}/#{action_hash}")
       path = "#{__dir__}/results/all/result_#{repository_name}/#{action_hash}/covered_files"
+			coverage_path = "#{__dir__}/results/all/result_#{repository_name}/#{action_hash}"
       folder = "all"
     else
       create_folder("#{__dir__}/results")
@@ -22,10 +24,12 @@ class Return_coverage_reports
       create_folder("#{__dir__}/results/added/result_#{repository_name}/")
       create_folder("#{__dir__}/results/added/result_#{repository_name}/#{action_hash}")
       path = "#{__dir__}/results/added/result_#{repository_name}/#{action_hash}/covered_files"
+			coverage_path = "#{__dir__}/results/added/result_#{repository_name}/#{action_hash}"
       folder = "added"
     end
     write_on_file(indented_output,path)
     get_covered_lines(file_path, covered_files, action_hash, repository_name, folder)
+		Correct_coverage_report.new.correct(coverage_path)
   end
 
   def get_covered_classes(file_path)

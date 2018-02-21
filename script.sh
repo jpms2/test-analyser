@@ -22,7 +22,7 @@ if [[ "$NUMERAL" = "2" ]]; then
     fi
 fi
 if ((NUMERAL >= 3)); then
-    RubyVERSION="2.1.0"
+    RubyVERSION="2.3.0"
 fi
 else
 	RubyVERSION=$3
@@ -36,17 +36,24 @@ source ~/.rvm/scripts/rvm
 type rvm | head -n 1
 a=$1; a="${a#*/}";a="${a#*/}";a="${a#*/}";a="${a#*/}"
 if [[ ${a%.*} = "whitehall" ]]; then
-rvm use "2.1.4"
+rvm use "2.2.3"
 else
   if [[ ${a%.*} = "RapidFTR" ]]; then
     rvm use "2.1.2"
   else
-    rvm use $RubyVERSION
+    if [[ ${a%.*} = "CBA" ]]; then
+	rvm use "2.3.0"
+    else
+        rvm use $RubyVERSION
+    fi
   fi
 fi
 
+gem install bundler
 sudo su -c '/etc/init.d/postgresql restart'
 sudo su -c '/etc/init.d/mysql restart'
+sudo systemctl restart mongodb
+
 
 cd "${a%.*}"
 
@@ -64,7 +71,7 @@ else
   fi
 
   if [[ ${a%.*} = "otwarchive" ]]; then
-    RAILS_ENV=test bundle exec rake db:drop db:setup db:migrate
+    bundle exec rake db:drop db:setup db:migrate
   fi
 
   if [[ ${a%.*} = "one-click-orgs" ]]; then 
@@ -79,7 +86,7 @@ else
     cd ${a%.*}
     bower link dough
   fi
-
+	npm install
   bundle install
   if [[ ${a%.*} = "whitehall" || ${a%.*} = "solar" ]]; then
     RAILS_ENV=test bundle exec rake db:setup

@@ -24,10 +24,10 @@ class Read
       model.ruby_v = row[2]
       model.rails_v = row[3]
       model.coveralls = row[4]
-      if row[5].include?('coveralls') || row[5].include?('simplecov')
+      if row[5].to_s.include?('coveralls') || row[5].to_s.include?('simplecov')
         all_tests = row[6].scan /[^;]*/
       else
-        all_tests = row[5].scan /[^;]*/
+        all_tests = row[5].to_s.scan /[^;]*/
       end
       index = 0
       model.test_dir = []
@@ -76,7 +76,7 @@ class Read
         index += 1
       end
       rep_name = (/[^\/]*$/.match(git_url)).to_s[0..-5]
-      if rep_name == "diaspora" || rep_name == "wpcc"
+      if rep_name == "diaspora" || rep_name == "wpcc" || rep_name == "one-click-orgs" || rep_name == "tip4commit" || rep_name == "whitehall"
         update_gemfile("#{__dir__}/#{rep_name}/Gemfile")
       end
       update_config_files(rep_name)
@@ -128,7 +128,8 @@ class Read
     diaspora_path = "#{__dir__}/#{rep_name}/config/diaspora.yml.example"
     redis_path = "#{__dir__}/#{rep_name}/config/redis-cucumber.conf.example"
     redis_conf_path = "#{__dir__}/#{rep_name}/config/redis.travis.example"
-      
+    redis_path2 = "#{__dir__}/#{rep_name}/config/redis.example"
+
     if File.file? config_path
       File.rename(config_path, config_path[0..-8])
     end
@@ -162,6 +163,9 @@ class Read
     if File.file? redis_conf_path
       File.rename(redis_conf_path, "#{redis_conf_path[0..-16]}.conf")
     end
+    if File.file? redis_path2
+      File.rename(redis_path2, "#{__dir__}/#{rep_name}/config/redis.yml")
+    end
   end
 
     def update_gemfile(path)
@@ -186,9 +190,25 @@ class Read
           index += 2
         else
          if file_lines[index].include? "http://gems.dev.mas.local"
-           updated_file.push("gem 'dough-ruby', path: '/home/ess/test-analyser/dough'\n")
+         	updated_file.push("gem 'dough-ruby', path: '/home/ess/test-analyser/dough'\n")
          else
-          updated_file.push(file_lines[index])
+					if	file_lines[index].include? "gem 'debugger'"
+						updated_file.push("\n")
+					else
+						if file_lines[index].include?("gem \"simplecov\", :platforms => :ruby_19")
+						updated_file.push("  gem \"simplecov\"\n")
+						else
+							if file_lines[index].include?("gem 'unicorn', '4.6.2'")
+								updated_file.push("#gem 'unicorn', '4.6.2'\n")
+							else
+								if file_lines[index].include?("gem 'raindrops', '0.11.0'")
+									updated_file.push("#gem 'raindrops', '0.11.0'\n")
+								else
+									updated_file.push(file_lines[index])
+								end
+							end
+						end
+					end
          end
         end
       end
@@ -251,5 +271,5 @@ class Read
 
 end
 
-Read.new.call_script('/home/ess/planilhas/websiteone-tests-all.xls')
+Read.new.call_script('/home/ess/planilhas/cypress-tests-all.xls')
 #Read.new.update_cov_config_file('C:/Users/jpms2/Desktop/testFile')
